@@ -9,20 +9,22 @@ codonList <- c(
 CodonPercN <- "CornCodonTable_V1N.txt"
 
 # String Find: pos <- instr(fnm, "_") + 1
-#' @export
 instr <- function(str1, str2, startpos=1, n=1){
   aa=unlist(strsplit(substring(str1, startpos), str2))
   if(length(aa) < n+1 ) return(0);
   return(sum(nchar(aa[1:n])) + startpos + (n-1)*nchar(str2) )
 }#instr
 
-#' @export
 filestem <- function(filenm){
   len <- nchar(filenm)
   str1 <- substr(filenm, len-3, len)
   if(str1 == ".txt") return(substr(filenm, 1, len-4))
 }#filestem
 
+#' Create a file with protein sequence in the third column
+#'
+#' @param infile DNA sequence file and Codon Usage Table file
+#' @return None (new file with "*_AddAAS.txt" will be created)
 #' @export
 TransProtein <- function(filenm, CodonPerc){
   fnm <- filenm
@@ -49,6 +51,10 @@ TransProtein <- function(filenm, CodonPerc){
   write.table(D1, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
 }#TransProtein
 
+#' Create a file with Codon count numbers
+#'
+#' @param infile DNA sequence file
+#' @return None (new file with "*_codonSEQ.txt" will be created)
 #' @export
 CodonCount <- function(filenm) {
   fnm <- filenm
@@ -80,6 +86,10 @@ CodonCount <- function(filenm) {
   write.table(DD, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
 }#CodonCount
 
+#' Create a file with Motif and Restrict Sites sequence count numbers
+#'
+#' @param infile DNA sequence file and Motif define file
+#' @return None (new file with "*_motifCount.txt" will be created)
 #' @export
 MotifCount <- function(filenm, motifnm){
   fnm0 <- motifnm
@@ -115,6 +125,10 @@ MotifCount <- function(filenm, motifnm){
   write.table(DD, file = fnm2, quote = FALSE, sep = "\t", row.names = FALSE)
 }#MotifCount
 
+#' Create a new Codon usage table file with normalized Codon usage values on last colum
+#'
+#' @param infile Codon Usage Table file
+#' @return None (new file with "*N.txt" will be created)
 #' @export
 normCodonPerc <- function(CodonPerc){
   D2 <- read.table(CodonPerc, header = TRUE)
@@ -134,6 +148,10 @@ normCodonPerc <- function(CodonPerc){
   write.table(RLT, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
 }#normCodonPerc
 
+#' Create a file with Rare codon and GC contents information
+#'
+#' @param infile DNA sequence file and New Codon Usage Table file
+#' @return None (new file with "*_RareCD.txt" will be created)
 #' @export
 RareCodonCalc <- function(filenm, CodonPercN){
   CDFv <- 0.3
@@ -186,6 +204,10 @@ RareCodonCalc <- function(filenm, CodonPercN){
   write.table(D1, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
 }#RareCodonCalc
 
+#' Create one graph file for each DNA sequence related with rare Codon information
+#'
+#' @param infile DNA sequence file and New Codon Usage Table file
+#' @return None (One or more PDF file(s) with related DNA sequence ID will be created)
 #' @export
 RareCodonGraph <- function(filenm, CodonPercN, f){
   fnm <- filenm
@@ -216,6 +238,10 @@ RareCodonGraph <- function(filenm, CodonPercN, f){
   }#s
 }#RareCodonGraph
 
+#' Create one graph file for each DNA sequence related with GC contents information
+#'
+#' @param infile DNA sequence file and DNA sequence file serial number
+#' @return None (One or more PDF file(s) with related DNA sequence ID will be created)
 #' @export
 GC_PercGraph <- function(filenm, f){
   bp1 = 14
@@ -251,3 +277,4 @@ GC_PercGraph <- function(filenm, f){
     dev.off()
   }#s
 }#GC_PercGraph
+
