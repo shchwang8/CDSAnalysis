@@ -262,11 +262,12 @@ RareCodonGraph <- function(filenm, CodonPercN, f){
       CAI <- CAI + value
     }#t
     CAI <- round(CAI / (strN-1), digits = 4)
-    mainS <- paste(D1[s, 1], "-Codon Adaption Index = ", CAI, sep = "")
+    mainS <- paste("(", D1[s, 1], ") Codon Adaption Index = ", CAI, sep = "")
     xlabS <- paste("Codon Position (1 - ", strN, ")", sep = "")
     fnm <- paste("File", f, "_", s, "-", D1[s, 1], "-CAI_Grpah.pdf", sep = "")
     pdf(file = fnm, pointsize = 8, width = 12)
-    barplot(RLT1, ylim = c(0, 1), xlab = xlabS, ylab = "1.0 - UsageRate", axes = TRUE, main = mainS, plot = TRUE)
+    barplot(RLT1, ylim = c(0, 1), xlab = xlabS, ylab = "Codon Usage Rate", main = mainS, plot = TRUE, axes = FALSE)#
+    axis(2, at = seq(1.0, 0.0, by = -0.1), labels = seq(0.0, 1.0, by = 0.1))
     dev.off()
   }#s
 }#RareCodonGraph
@@ -303,7 +304,7 @@ GC_PercGraph <- function(filenm, f){
       RLT <- c(RLT, GC_Count)
     }#w
     fnm <- paste("File", f, "_", s, "-", D1[s, 1], "-GC_Perc_Grpah.pdf", sep = "")
-    mainS <- paste(D1[s, 1], "-GC Percentage in Moving Windows", sep = "")
+    mainS <- paste("(", D1[s, 1], ") GC Percentage in Moving Windows", sep = "")
     xlabS <- paste("42 bp Windows with 21 bp Steps (1 - ", stepN, ")", sep = "")
     pdf(file = fnm, pointsize = 8, width = 12)
     # barplot(RLT, ylim = c(0, 0.8), ylab = "GC Percentages", xlab = xlabS, main = mainS)
