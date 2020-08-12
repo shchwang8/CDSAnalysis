@@ -51,12 +51,12 @@ TransProtein <- function(filenm, CodonPerc){
   write.table(D1, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
 }#TransProtein
 
-#' Create a file with Codon count numbers
+#' Create a file with Codon count numbers and a file with codon usage
 #'
 #' @param infile DNA sequence file
-#' @return None (new file with "*_codonSEQ.txt" will be created)
+#' @return None (new files with "*_codonSEQ.txt" and "_codonUSTB" will be created)
 #' @export
-CodonCount <- function(filenm) {
+CodonCount <- function(filenm, CodonPerc) {
   fnm <- filenm
   DD <- read.table(fnm, header = TRUE, sep = "\t")
   N = nrow(DD)
@@ -83,7 +83,38 @@ CodonCount <- function(filenm) {
   } #for i
   fnm0 <- filestem(filenm)
   fnm <- paste(fnm0, "_codonSEQ.txt", sep = "")
+  M <- ncol(DD)
+  DD <- DD[, c(1, 3:M)]
   write.table(DD, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
+  ######
+  RLT <- read.table(CodonPerc, header = TRUE, sep = "\t")
+  RLT <- RLT[, 1:4]
+  RLT$Perc <- 0
+  RLT$Perc_Norm <- 0
+  RLT$Count <- 0
+  N <- nrow(RLT)
+  g <- 1
+  for(g in c(1:N)){
+    str <- RLT[g, 4]
+    col <- which(colnames(DD) == str)
+    RLT[g, 7] <- sum(DD[[col]])
+  }#g
+  grpN <- 21
+  g <- 1
+  for(g in c(1:grpN)){
+    D2a <- RLT[RLT[[2]]==g, ]
+    sm <- sum(D2a[[7]])
+    D2a[[5]] <- round(D2a[[7]] / sm, digits = 4)
+    mx <- max(D2a[[5]])
+    D2a[[6]] <- round(D2a[[5]]/mx, digits = 4)
+    if(g == 1) RLT2 <- D2a
+    else{
+      RLT2 <- rbind(RLT2, D2a)
+    }
+  }#g
+  fnm0 <- filestem(filenm)
+  fnm <- paste(fnm0, "_codonUSTB.txt", sep = "")
+  write.table(RLT2, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
 }#CodonCount
 
 #' Create a file with Motif and Restrict Sites sequence count numbers
@@ -144,7 +175,8 @@ normCodonPerc <- function(CodonPerc){
     }
   }#g
   # fnm <- "CornCodonTable_V2.txt"
-  fnm <- paste(filestem(CodonPerc), "N.txt", sep = "")
+  # fnm <- paste(filestem(CodonPerc), "N.txt", sep = "")
+  fnm <- CodonPercN
   write.table(RLT, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
 }#normCodonPerc
 
@@ -202,6 +234,7 @@ RareCodonCalc <- function(filenm, CodonPercN){
   fnm0 <- filestem(filenm)
   fnm <- paste(fnm0, "_RareCD.txt", sep = "")
   write.table(D1, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
+
 }#RareCodonCalc
 
 #' Create one graph file for each DNA sequence related with rare Codon information
@@ -232,7 +265,7 @@ RareCodonGraph <- function(filenm, CodonPercN, f){
     mainS <- paste(D1[s, 1], "-Codon Adaption Index = ", CAI, sep = "")
     xlabS <- paste("Codon Position (1 - ", strN, ")", sep = "")
     fnm <- paste("File", f, "_", s, "-", D1[s, 1], "-CAI_Grpah.pdf", sep = "")
-    pdf(file = fnm, pointsize = 8, width = 10)
+    pdf(file = fnm, pointsize = 8, width = 12)
     barplot(RLT1, ylim = c(0, 1), xlab = xlabS, ylab = "1.0 - UsageRate", axes = TRUE, main = mainS, plot = TRUE)
     dev.off()
   }#s
@@ -272,9 +305,9 @@ GC_PercGraph <- function(filenm, f){
     fnm <- paste("File", f, "_", s, "-", D1[s, 1], "-GC_Perc_Grpah.pdf", sep = "")
     mainS <- paste(D1[s, 1], "-GC Percentage in Moving Windows", sep = "")
     xlabS <- paste("42 bp Windows with 21 bp Steps (1 - ", stepN, ")", sep = "")
-    pdf(file = fnm, pointsize = 8, width = 10)
-    barplot(RLT, ylim = c(0, 0.8), ylab = "GC Percentages", xlab = xlabS, main = mainS)
+    pdf(file = fnm, pointsize = 8, width = 12)
+    # barplot(RLT, ylim = c(0, 0.8), ylab = "GC Percentages", xlab = xlabS, main = mainS)
+    plot(RLT, ylim = c(0, 1), ylab = "GC Percentages", xlab = xlabS, main = mainS, type = 'b')
     dev.off()
   }#s
 }#GC_PercGraph
-
