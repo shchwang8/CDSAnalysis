@@ -23,10 +23,10 @@ filestem <- function(filenm){
 
 #' Create a file with protein sequence in the third column
 #'
-#' @param infile DNA sequence file and Codon Usage Table file
-#' @return None (new file with "*_AddAAS.txt" will be created)
+#' @param infile "DNA sequence file", "Codon Usage Table file", "Result Excel file and "Input file serial number"
+#' @return None (Result file with "*_AddAAS.txt" and Excel sheet "AAseq" will be created)
 #' @export
-TransProtein <- function(filenm, CodonPerc){
+TransProtein <- function(filenm, CodonPerc, xlsxFS, f){
   fnm <- filenm
   D1 <- read.table(fnm, header = TRUE, sep = "\t")
   D1N <- nrow(D1)
@@ -49,14 +49,20 @@ TransProtein <- function(filenm, CodonPerc){
   fnm0 <- filestem(filenm)
   fnm <- paste(fnm0, "_AddAAS.txt", sep = "")
   write.table(D1, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
+  sheetS <- paste(f, "-AAseq", sep = "")
+  if(f == 1){
+    write.xlsx(D1, xlsxFS, sheetName = sheetS, col.names = TRUE, row.names = FALSE, append = FALSE)
+  }else{
+    write.xlsx(D1, xlsxFS, sheetName = sheetS, col.names = TRUE, row.names = FALSE, append = TRUE)
+  }
 }#TransProtein
 
 #' Create a file with Codon count numbers and a file with codon usage
 #'
-#' @param infile DNA sequence file
-#' @return None (new files with "*_codonSEQ.txt" and "_codonUSTB" will be created)
+#' @param infile "DNA sequence file", "Codon Usage Table file", "Result Excel file and "Input file serial number"
+#' @return None (Result files with "*_codonSEQ.txt" and "_codonUSTB" and Excel sheets will be created)
 #' @export
-CodonCount <- function(filenm, CodonPerc) {
+CodonCount <- function(filenm, CodonPerc, xlsxFS, f) {
   fnm <- filenm
   DD <- read.table(fnm, header = TRUE, sep = "\t")
   N = nrow(DD)
@@ -86,6 +92,8 @@ CodonCount <- function(filenm, CodonPerc) {
   M <- ncol(DD)
   DD <- DD[, c(1, 3:M)]
   write.table(DD, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
+  sheetS <- paste(f, "-CodonCount", sep = "")
+  write.xlsx(DD, xlsxFS, sheetName = sheetS, col.names = TRUE, row.names = FALSE, append = TRUE)
   ######
   RLT <- read.table(CodonPerc, header = TRUE, sep = "\t")
   RLT <- RLT[, 1:4]
@@ -114,15 +122,17 @@ CodonCount <- function(filenm, CodonPerc) {
   }#g
   fnm0 <- filestem(filenm)
   fnm <- paste(fnm0, "_codonUSTB.txt", sep = "")
-  write.table(RLT2, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
+  write.table(RLT2, file = fnm, quote = FALSE, sep = "\t", row.names = TRUE)
+  sheetS <- paste(f, "-CodonUsage", sep = "")
+  write.xlsx(RLT2, xlsxFS, sheetName = sheetS, col.names = TRUE, row.names = FALSE, append = TRUE)
 }#CodonCount
 
 #' Create a file with Motif and Restrict Sites sequence count numbers
 #'
-#' @param infile DNA sequence file and Motif define file
-#' @return None (new file with "*_motifCount.txt" will be created)
+#' @param infile "DNA sequence file", "Motif define file", "Result Excel file and "Input file serial number"
+#' @return None (Result file with "*_motifCount.txt" and Excel sheet will be created)
 #' @export
-MotifCount <- function(filenm, motifnm){
+MotifCount <- function(filenm, motifnm, xlsxFS, f){
   fnm0 <- motifnm
   D1 <- read.table(fnm0, header = TRUE, sep = "\t")
   motifList <- as.vector(D1[, 1])
@@ -151,15 +161,22 @@ MotifCount <- function(filenm, motifnm){
   New <- New - 1
   New <- c("Maxium Allowed", New, "...")
   DD <- InsertRow(DD, NewRow = New, RowNum = 1)
+  M <- ncol(DD)
+  for(j in c(2:(M-1))){
+    DD[[j]] <- as.numeric(DD[[j]])
+  }
+  # DD[, 2:(M-1)] <- as.numeric(DD[, 2:(M-1)])
   fnm0 <- filestem(filenm)
   fnm2 <- paste(fnm0, "_motifCount.txt", sep = "")
   write.table(DD, file = fnm2, quote = FALSE, sep = "\t", row.names = FALSE)
+  sheetS <- paste(f, "-MotifCount", sep = "")
+  write.xlsx(DD, xlsxFS, sheetName = sheetS, col.names = TRUE, row.names = FALSE, append = TRUE)
 }#MotifCount
 
-#' Create a new Codon usage table file with normalized Codon usage values on last colum
+#' Create a new Codon usage table file with normalized Codon usage values on last column
 #'
-#' @param infile Codon Usage Table file
-#' @return None (new file with "*N.txt" will be created)
+#' @param infile "Codon Usage Table file"
+#' @return None (Result file with "*N.txt"  and Excel sheet will be created)
 #' @export
 normCodonPerc <- function(CodonPerc){
   D2 <- read.table(CodonPerc, header = TRUE)
@@ -182,10 +199,10 @@ normCodonPerc <- function(CodonPerc){
 
 #' Create a file with Rare codon and GC contents information
 #'
-#' @param infile DNA sequence file and New Codon Usage Table file
-#' @return None (new file with "*_RareCD.txt" will be created)
+#' @param infile "DNA sequence file", "New codon Usage Table file", "Result Excel file and "Input file serial number"
+#' @return None (Result file with "*_RareCD.txt"  and Excel sheet will be created)
 #' @export
-RareCodonCalc <- function(filenm, CodonPercN){
+RareCodonCalc <- function(filenm, CodonPercN, xlsxFS, f){
   CDFv <- 0.3
   fnm <- filenm
   D1 <- read.table(fnm, header = TRUE, sep = "\t")
@@ -234,21 +251,24 @@ RareCodonCalc <- function(filenm, CodonPercN){
   fnm0 <- filestem(filenm)
   fnm <- paste(fnm0, "_RareCD.txt", sep = "")
   write.table(D1, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
-
+  sheetS <- paste(f, "-RareCodonInf", sep = "")
+  write.xlsx(D1, xlsxFS, sheetName = sheetS, col.names = TRUE, row.names = FALSE, append = TRUE)
 }#RareCodonCalc
 
 #' Create one graph file for each DNA sequence related with rare Codon information
 #'
-#' @param infile DNA sequence file and New Codon Usage Table file
-#' @return None (One or more PDF file(s) with related DNA sequence ID will be created)
+#' @param infile "DNA sequence file", "New codon Usage Table file", "Result Excel file and "Input file serial number"
+#' @return None (One or more graph PDF file(s) with related DNA sequence ID will be created)
 #' @export
-RareCodonGraph <- function(filenm, CodonPercN, f){
+RareCodonGraph <- function(filenm, CodonPercN, f, ranges){
   fnm <- filenm
   D1 <- read.table(fnm, header = TRUE, sep = "\t")
   D1N <- nrow(D1)
   D2 <- read.table(CodonPercN, header = TRUE, sep = "\t")
   s <- 1
-  for(s in c(1:D1N)){
+  if(length(ranges) == 0) ranges <- c(1:D1N)
+  for(s in ranges){
+    if(s > D1N) break
     str1 <- toupper(D1[s, 2])
     str2 <- stri_sub(str1, seq(1, stri_length(str1),by=3), length=3)
     strN <- length(str2)
@@ -264,7 +284,7 @@ RareCodonGraph <- function(filenm, CodonPercN, f){
     CAI <- round(CAI / (strN-1), digits = 4)
     mainS <- paste("(", D1[s, 1], ") Codon Adaption Index = ", CAI, sep = "")
     xlabS <- paste("Codon Position (1 - ", strN, ")", sep = "")
-    fnm <- paste("File", f, "_", s, "-", D1[s, 1], "-CAI_Grpah.pdf", sep = "")
+    fnm <- paste("CAIGrpah-File", f, "_", s, "-", D1[s, 1], ".pdf", sep = "")
     pdf(file = fnm, pointsize = 8, width = 12)
     barplot(RLT1, ylim = c(0, 1), xlab = xlabS, ylab = "Codon Usage Rate", main = mainS, plot = TRUE, axes = FALSE)#
     axis(2, at = seq(1.0, 0.0, by = -0.1), labels = seq(0.0, 1.0, by = 0.1))
@@ -274,17 +294,19 @@ RareCodonGraph <- function(filenm, CodonPercN, f){
 
 #' Create one graph file for each DNA sequence related with GC contents information
 #'
-#' @param infile DNA sequence file and DNA sequence file serial number
-#' @return None (One or more PDF file(s) with related DNA sequence ID will be created)
+#' @param infile "DNA sequence file", "Result Excel file and "Input file serial number"
+#' @return None (One or more graph PDF file(s) with related DNA sequence ID will be created)
 #' @export
-GC_PercGraph <- function(filenm, f){
+GC_PercGraph <- function(filenm, f, ranges){
   bp1 = 14
   bp2 = 7
   fnm <- filenm
   D1 <- read.table(fnm, header = TRUE, sep = "\t")
   D1N <- nrow(D1)
   s <- 1
-  for(s in c(1:D1N)){
+  if(length(ranges) == 0) ranges <- c(1:D1N)
+  for(s in ranges){
+    if(s > D1N) break
     str1 <- toupper(D1[s, 2])
     str2 <- stri_sub(str1, seq(1, stri_length(str1),by=3), length=3)
     strN <- length(str2)
@@ -303,7 +325,7 @@ GC_PercGraph <- function(filenm, f){
       GC_Count <- round(GC_Count / (bp1*3), digits = 4)
       RLT <- c(RLT, GC_Count)
     }#w
-    fnm <- paste("File", f, "_", s, "-", D1[s, 1], "-GC_Perc_Grpah.pdf", sep = "")
+    fnm <- paste("GCPercGrpah-File", f, "_", s, "-", D1[s, 1], ".pdf", sep = "")
     mainS <- paste("(", D1[s, 1], ") GC Percentage in Moving Windows", sep = "")
     xlabS <- paste("42 bp Windows with 21 bp Steps (1 - ", stepN, ")", sep = "")
     pdf(file = fnm, pointsize = 8, width = 12)
