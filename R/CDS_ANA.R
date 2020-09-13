@@ -334,3 +334,106 @@ GC_PercGraph <- function(filenm, f, ranges){
     dev.off()
   }#s
 }#GC_PercGraph
+
+#' Create a file with Codon count numbers (adjust by position) and a file with Codon usage
+#'
+#' @param infile "DNA sequence file", "Codon Usage Table file", "Result Excel file and "Input file serial number"
+#' @return None (Result files with "*_codonSEQ.txt" and "_codonUSTB" and Excel sheets will be created)
+#' @export
+CodonCountPos <- function(filenm, CodonPerc, xlsxFS, f, metds = 1) {
+  metds <- 1
+  if(metds == 1){ #divided whole seq into segments
+    nParts <- 5
+    # nWeigt <- c(1.33, 1.0, 0.84, 0.83, 1.0)
+    nWeigt <- c(1.8, 1.1, 0.7, 0.5, 0.9)
+  }
+  fnm <- filenm
+  DD <- read.table(fnm, header = TRUE, sep = "\t")
+  N = nrow(DD)
+  M <- length(codonList)
+  colnames(DD)[1] <- "Gene_ID"
+  DD$RanVal <- runif(N)*10
+  for(c in c(1:M)){
+    DD[c + 3] <- rep(0, N)
+    colnames(DD)[c + 3] <- codonList[c]
+  }
+  DD <- DD[, colnames(DD)[c(1, 3, c(4:(M+3)), 2)]]
+  M <- ncol(DD)
+  i <- 1
+  for(i in c(1:N)){
+    x <- toupper(toString(DD[i, M]))
+    slen1 <- nchar(x) / 3
+    slen2 <- as.integer(slen1 / nParts) * 3
+    slen3 <- c(slen2, slen2, slen2, slen2, nchar(x)-(slen2*4))
+    k <- 1
+    for(k in c(1:nParts)){
+      if(k == 1){
+        xx <- c(substr(x, 1, slen3[k]))
+        len <- slen3[k]
+      }else{
+        xx <- c(xx, substr(x, len+1, len+slen3[k]))
+        len <- len + slen3[k]
+      }
+    }#k
+    k <- 2
+    for(k in c(1:nParts)){
+      strVec <- substring(xx[k], seq(1, nchar(xx[k]), 3), seq(3, nchar(xx[k]), 3))
+      ctTab <- as.data.frame(table(strVec))
+      # ctTab$Freq <- ctTab$Freq*nWeigt[k]
+      if(k == 1){
+        j <- 3
+        for(j in c(3:(M-1))){
+          nm <- colnames(DD)[j]
+          val <- ctTab[ctTab$strVec==nm, 2]
+          if(length(val) > 0) DD[i, j] <- val*nWeigt[k]
+        } #for j
+      }else{
+        j <- 3
+        for(j in c(3:(M-1))){
+          nm <- colnames(DD)[j]
+          val <- ctTab[ctTab$strVec==nm, 2]
+          if(length(val) > 0) DD[i, j] <- DD[i, j] + val*nWeigt[k]
+        } #for j
+      }
+    }#k
+  } #for i
+  # DD[1:3, 1:15]
+  fnm0 <- filestem(filenm)
+  fnm <- paste(fnm0, "_codonSEQ_pos.txt", sep = "")
+  M <- ncol(DD)
+  DD <- DD[, c(1, 3:M)]
+  write.table(DD, file = fnm, quote = FALSE, sep = "\t", row.names = FALSE)
+  sheetS <- paste(f, "-CodonCount_pos", sep = "")
+  write.xlsx(DD, xlsxFS, sheetName = sheetS, col.names = TRUE, row.names = FALSE, append = TRUE)
+  ######
+  RLT <- read.table(CodonPerc, header = TRUE, sep = "\t")
+  RLT <- RLT[, 1:4]
+  RLT$Perc <- 0
+  RLT$Perc_Norm <- 0
+  RLT$Count <- 0
+  N <- nrow(RLT)
+  g <- 1
+  for(g in c(1:N)){
+    str <- RLT[g, 4]
+    col <- which(colnames(DD) == str)
+    RLT[g, 7] <- sum(DD[[col]])
+  }#g
+  grpN <- 21
+  g <- 1
+  for(g in c(1:grpN)){
+    D2a <- RLT[RLT[[2]]==g, ]
+    sm <- sum(D2a[[7]])
+    D2a[[5]] <- round(D2a[[7]] / sm, digits = 4)
+    mx <- max(D2a[[5]])
+    D2a[[6]] <- round(D2a[[5]]/mx, digits = 4)
+    if(g == 1) RLT2 <- D2a
+    else{
+      RLT2 <- rbind(RLT2, D2a)
+    }
+  }#g
+  fnm0 <- filestem(filenm)
+  fnm <- paste(fnm0, "_codonUSTB_pos.txt", sep = "")
+  write.table(RLT2, file = fnm, quote = FALSE, sep = "\t", row.names = TRUE)
+  sheetS <- paste(f, "-CodonUsage_pos", sep = "")
+  write.xlsx(RLT2, xlsxFS, sheetName = sheetS, col.names = TRUE, row.names = FALSE, append = TRUE)
+}#CodonCountPos

@@ -4,13 +4,13 @@
 \alias{GC_PercGraph}
 \title{Create one graph file for each DNA sequence related with GC contents information}
 \usage{
-GC_PercGraph(filenm, f)
+GC_PercGraph(filenm, f, ranges)
 }
 \arguments{
-\item{infile}{DNA sequence file and DNA sequence file serial number}
+\item{infile}{"DNA sequence file", "Result Excel file and "Input file serial number"}
 }
 \value{
-None (One or more PDF file(s) with related DNA sequence ID will be created)
+None (One or more graph PDF file(s) with related DNA sequence ID will be created)
 }
 \description{
 Create one graph file for each DNA sequence related with GC contents information

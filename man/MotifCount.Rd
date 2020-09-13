@@ -4,13 +4,13 @@
 \alias{MotifCount}
 \title{Create a file with Motif and Restrict Sites sequence count numbers}
 \usage{
-MotifCount(filenm, motifnm)
+MotifCount(filenm, motifnm, xlsxFS, f)
 }
 \arguments{
-\item{infile}{DNA sequence file and Motif define file}
+\item{infile}{"DNA sequence file", "Motif define file", "Result Excel file and "Input file serial number"}
 }
 \value{
-None (new file with "*_motifCount.txt" will be created)
+None (Result file with "*_motifCount.txt" and Excel sheet will be created)
 }
 \description{
 Create a file with Motif and Restrict Sites sequence count numbers

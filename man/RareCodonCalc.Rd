@@ -4,13 +4,13 @@
 \alias{RareCodonCalc}
 \title{Create a file with Rare codon and GC contents information}
 \usage{
-RareCodonCalc(filenm, CodonPercN)
+RareCodonCalc(filenm, CodonPercN, xlsxFS, f)
 }
 \arguments{
-\item{infile}{DNA sequence file and New Codon Usage Table file}
+\item{infile}{"DNA sequence file", "New codon Usage Table file", "Result Excel file and "Input file serial number"}
 }
 \value{
-None (new file with "*_RareCD.txt" will be created)
+None (Result file with "*_RareCD.txt"  and Excel sheet will be created)
 }
 \description{
 Create a file with Rare codon and GC contents information

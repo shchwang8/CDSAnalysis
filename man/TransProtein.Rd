@@ -4,13 +4,13 @@
 \alias{TransProtein}
 \title{Create a file with protein sequence in the third column}
 \usage{
-TransProtein(filenm, CodonPerc)
+TransProtein(filenm, CodonPerc, xlsxFS, f)
 }
 \arguments{
-\item{infile}{DNA sequence file and Codon Usage Table file}
+\item{infile}{"DNA sequence file", "Codon Usage Table file", "Result Excel file and "Input file serial number"}
 }
 \value{
-None (new file with "*_AddAAS.txt" will be created)
+None (Result file with "*_AddAAS.txt" and Excel sheet "AAseq" will be created)
 }
 \description{
 Create a file with protein sequence in the third column

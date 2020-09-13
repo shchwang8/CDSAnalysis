@@ -2,16 +2,16 @@
 % Please edit documentation in R/CDS_ANA.R
 \name{normCodonPerc}
 \alias{normCodonPerc}
-\title{Create a new Codon usage table file with normalized Codon usage values on last colum}
+\title{Create a new Codon usage table file with normalized Codon usage values on last column}
 \usage{
 normCodonPerc(CodonPerc)
 }
 \arguments{
-\item{infile}{Codon Usage Table file}
+\item{infile}{"Codon Usage Table file"}
 }
 \value{
-None (new file with "*N.txt" will be created)
+None (Result file with "*N.txt"  and Excel sheet will be created)
 }
 \description{
-Create a new Codon usage table file with normalized Codon usage values on last colum
+Create a new Codon usage table file with normalized Codon usage values on last column
 }

@@ -4,13 +4,13 @@
 \alias{RareCodonGraph}
 \title{Create one graph file for each DNA sequence related with rare Codon information}
 \usage{
-RareCodonGraph(filenm, CodonPercN, f)
+RareCodonGraph(filenm, CodonPercN, f, ranges)
 }
 \arguments{
-\item{infile}{DNA sequence file and New Codon Usage Table file}
+\item{infile}{"DNA sequence file", "New codon Usage Table file", "Result Excel file and "Input file serial number"}
 }
 \value{
-None (One or more PDF file(s) with related DNA sequence ID will be created)
+None (One or more graph PDF file(s) with related DNA sequence ID will be created)
 }
 \description{
 Create one graph file for each DNA sequence related with rare Codon information
